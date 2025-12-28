@@ -1,7 +1,6 @@
 "use client"
 
 import { z } from "zod"
-import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
@@ -9,11 +8,12 @@ import InputElement from "@/components/custom-form/input-element"
 import { toast } from "sonner"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useMutation } from '@tanstack/react-query'
 import { useState } from "react"
 import { LuEye, LuEyeClosed } from "react-icons/lu"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { createRandomString } from "@/utils/better-auth"
+import { authClient, signInWithGoogle } from "@/lib/auth-client"
 import {
     Card,
     CardContent,
@@ -26,8 +26,8 @@ const formSchema = z.object({
     email: z.string().min(5, {
         message: "Email must be at least 5 characters"
     }),
-    password: z.string().min(5, {
-        message: "Password must be at least 5 characters"
+    password: z.string().min(8, {
+        message: "Password must be at least 8 characters"
     }),
 })
 
@@ -37,9 +37,9 @@ export default function Register() {
 
 const router = useRouter() 
 
-    const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
-
     const [showPassword, setShowPassword] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
+
     function toggleVisibility() {
         setShowPassword(prev => !prev)
     }
@@ -52,38 +52,25 @@ const router = useRouter()
         }
     })
 
-    const {isPending:loading, isError, error, mutate} = useMutation({
-        mutationFn: async (registerData: z.infer<typeof formSchema>) => {
-            console.log("submitting with:")
-            console.log(registerData)
-            // const response = await fetch("http://localhost:8080/auth/register", {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     },
-            //     credentials: "include",
-            //     body: JSON.stringify({
-            //         username: registerData.name,
-            //         email: registerData.email,
-            //         password: registerData.password
-            //     })
-            // })
-            // if (!response.ok) {
-            //     const payload = await response.text()
-            //     throw new Error(payload)
-            // }
-            return registerData.email
-        },
-        onSuccess: (email: string) => {
-            // router.push(`/verify?email=${email}`)
-        },
-        onError: (e: any) => {
-            toast.error(e?.message ?? "Failed to register")
-        }
-    })
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-       mutate(values)
+       await authClient.signUp.email({
+            email: values.email,
+            password: values.password,
+            name: createRandomString(15),
+            callbackURL: "/login" // redirect url after verifying email
+        }, {
+            onRequest: (ctx) => {
+                setLoading(true)
+            },
+            onSuccess: (ctx) => {
+                setLoading(false)
+                router.replace("/verify?s=1")
+            },
+            onError: (ctx) => {
+                setLoading(false)
+                toast.error(ctx.error.message)
+            },
+        })
     }
 
     return (
@@ -110,17 +97,17 @@ const router = useRouter()
                                             </div>
                                             <div className="grid gap-3">
                                                 <Label htmlFor="password">Password</Label>
-                                                <div className="w-full relative">
-                                                    <InputElement
-                                                        name="password"
-                                                        placeholder=""
-                                                        type={showPassword ? "text" : "password"}
-                                                        isOptional={false}
-                                                    />
-                                                    {!showPassword ? <LuEye className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
-                                                    : <LuEyeClosed className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
+                                                <InputElement
+                                                    name="password"
+                                                    placeholder=""
+                                                    type={showPassword ? "text" : "password"}
+                                                    isOptional={false}
+                                                    customElement={
+                                                        !showPassword ? 
+                                                        <LuEye className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
+                                                        : <LuEyeClosed className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
                                                     }
-                                                </div>
+                                                />
                                             </div>
                                             <Button type="submit" className="w-full" disabled={loading === true}>
                                                 {loading ? <Loader2 className="size-4 animate-spin"/> : "Register"}

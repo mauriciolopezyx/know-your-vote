@@ -4,9 +4,6 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { QueryProvider } from "@/contexts/query-provider"
 import { ThemeProvider } from "@/contexts/theme-provider"
-import { AuthProvider } from "@/contexts/auth-context"
-import ProtectedRoute from "@/components/protected-route"
-import TopBar from "@/components/top-bar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,12 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <QueryProvider>
-            <AuthProvider>
-              <ProtectedRoute>
-                <TopBar />
-                {children}
-              </ProtectedRoute>
-            </AuthProvider>
+            {children}
           </QueryProvider>
           <Toaster />
         </ThemeProvider>
