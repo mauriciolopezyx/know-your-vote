@@ -1,9 +1,11 @@
 //import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import localFont from "next/font/local"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { QueryProvider } from "@/contexts/query-provider"
 import { ThemeProvider } from "@/contexts/theme-provider"
+import TopBar from "@/components/top-bar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +15,53 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+})
+
+export const bree = localFont({
+  src: [
+    {
+      path: "./Bree Light.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "./Bree Light Oblique.otf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "./Bree Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./Bree Oblique.otf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "./Bree Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./Bree Bold Oblique.otf",
+      weight: "700",
+      style: "italic",
+    },
+    {
+      path: "./Bree ExtraBold.otf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "./Bree ExtraBold Oblique.otf",
+      weight: "800",
+      style: "italic",
+    },
+  ],
+  variable: "--font-bree",
+  display: "swap",
 })
 
 // export const metadata: Metadata = {
@@ -26,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={bree.className} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -37,6 +86,7 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <QueryProvider>
+            <TopBar />
             {children}
           </QueryProvider>
           <Toaster />
