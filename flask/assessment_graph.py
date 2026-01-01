@@ -130,7 +130,7 @@ Respond ONLY with valid JSON. Example:
 }}"""
         
         result = client.models.generate_content(
-            model="gemini-2.0-flash-exp",
+            model="gemini-2.5-flash",
             contents=prompt,
             config={"temperature": 0.3}
         )

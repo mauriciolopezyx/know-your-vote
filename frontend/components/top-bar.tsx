@@ -21,11 +21,11 @@ export default function TopBar() {
 
     return (
         <header className="flex flex-row justify-between items-center py-4 px-10 bg-blue-500 text-white">
-            <nav className="flex flex-row items-center gap-x-5">
+            <nav className="flex flex-row items-center gap-x-8">
                 <Link href="/" className="text-xl font-bold">KnowYourVote</Link>
-                <ul className="flex flex-row gap-x-4 font-normal">
+                <ul className="flex flex-row gap-x-5 font-normal">
                     <Link href="/">Home</Link>
-                    <Link href="/">Placement</Link>
+                    <Link href="/assessment">Assessment</Link>
                     <Link href="/">News</Link>
                     <Link href="/">Account</Link>
                 </ul>
@@ -35,8 +35,8 @@ export default function TopBar() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="secondary" size="icon" className="rounded-full">
-                        <IoMdPerson className="rounded-full fill-black dark:fill-white"/>
-                        <span className="sr-only">Toggle user menu</span>
+                            <IoMdPerson className="rounded-full fill-black dark:fill-white"/>
+                            <span className="sr-only">Toggle user menu</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
