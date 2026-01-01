@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
@@ -17,9 +17,12 @@ limiter = Limiter(
 )
 assessment_graph = create_assessment_graph()
 
-@app.route("/assess", methods=["POST"])
+@app.route("/assess", methods=["POST", "OPTIONS"])
 @limiter.limit("2 per minute")
 def assess():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+    
     data = request.get_json()
     
     if not data:
@@ -41,7 +44,7 @@ def assess():
     
     final_state = assessment_graph.invoke(initial_state)
     
-    return jsonify({
+    return _corsify_actual_response(jsonify({
         "assessment_id": final_state["assessment_id"],
         "classification": final_state["final_classification"].classification,
         "confidence_score": final_state["final_classification"].confidence_score,
@@ -55,11 +58,22 @@ def assess():
             }
             for de in final_state["domain_evaluations"]
         ]
-    }), 200
+    })), 200
 
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "healthy"}), 200
+
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+    return response
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=5000)

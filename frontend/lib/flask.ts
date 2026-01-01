@@ -1,0 +1,1 @@
+export const FLASK_SERVER = "http://localhost:5000"
