@@ -1,3 +1,5 @@
+"use client"
+
 import { queryOptions } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
 

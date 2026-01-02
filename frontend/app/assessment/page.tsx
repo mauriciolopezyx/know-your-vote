@@ -10,6 +10,8 @@ import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { FLASK_SERVER } from "@/lib/flask"
 import { authClient } from "@/lib/auth-client"
+import { AssessmentResponse } from "@/components/assessment-result"
+import AssessmentResult from "@/components/assessment-result"
 // import { createAssessmentMutationOptions } from "@/hooks/mutation-options"
 
 export default function AssessmentPage() {
@@ -18,10 +20,12 @@ export default function AssessmentPage() {
   const {data:assessment, isPending:assessmentLoading, error:assessmentError} = useQuery(createAssessmentQuestionQueryOptions())
   const [responses, setResponses] = useState<string[]>(new Array(6).fill(""))
   const [question, setQuestion] = useState<number>(0)
+  const [assessmentResponse, setAssessmentResponse] = useState<AssessmentResponse | null>(null)
+
   const responsesFilled = responses.filter(res => res.trim().length >= 25).length
   const canSubmit = responsesFilled === 6
 
-  const {data:assessmentResults, mutate:submitAssessment} = useMutation({
+  const {mutate:submitAssessment} = useMutation({
     mutationFn: async () => {
       if (!canSubmit || !session) return
       const formattedResponses = responses.map((res, i) => {
@@ -44,7 +48,7 @@ export default function AssessmentPage() {
       return await response.json()
     },
     onSuccess: (res) => {
-      console.log(res)
+      setAssessmentResponse(res)
     }
   })
 
@@ -57,8 +61,6 @@ export default function AssessmentPage() {
   const onAssessmentSubmit = () => {
     submitAssessment()
   }
-
-  console.log("assessment results:", assessmentResults)
 
   if (assessmentLoading) {
     return (
@@ -74,7 +76,9 @@ export default function AssessmentPage() {
     )
   }
 
-  console.log("assessment & Responses:", assessment, responses, "resfilled:", responsesFilled)
+  if (assessmentResponse) {
+    return <AssessmentResult />
+  }
 
   return (
     <div className="min-h-screen bg-muted p-6 md:p-8">
