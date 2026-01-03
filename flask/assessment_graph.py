@@ -13,7 +13,8 @@ from db import (
     create_assessment,
     create_assessment_response,
     create_knowledge_gap,
-    get_question_domains
+    get_question_domains,
+    assign_lessons_to_user
 )
 import json
 
@@ -228,6 +229,20 @@ def persist_results_node(state: GraphState) -> GraphState:
             domain_eval.gaps_identified,
             domain_eval.priority
         )
+    
+    gap_domains = []
+
+    # Collect domains with gaps for lesson assignment
+    if domain_eval.gaps_identified:
+        gap_domains.append(domain_eval.domain)
+    
+    # Assign personalized lessons based on gaps
+    # Strong users only get core lessons (empty gap_domains)
+    # Partial/needs_foundations users get core + targeted lessons
+    if classification.classification == "strong":
+        assign_lessons_to_user(state["user_id"], [])
+    else:
+        assign_lessons_to_user(state["user_id"], gap_domains)
     
     return state
 

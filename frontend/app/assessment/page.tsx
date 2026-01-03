@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
-import { createAssessmentQuestionQueryOptions } from "@/hooks/query-options"
+import { createAssessmentQueryOptions } from "@/hooks/query-options"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
@@ -17,7 +17,7 @@ import AssessmentResult from "@/components/assessment-result"
 export default function AssessmentPage() {
 
   const { data:session } = authClient.useSession()
-  const {data:assessment, isPending:assessmentLoading, error:assessmentError} = useQuery(createAssessmentQuestionQueryOptions())
+  const {data:assessment, isPending:assessmentLoading, error:assessmentError} = useQuery(createAssessmentQueryOptions())
   const [responses, setResponses] = useState<string[]>(new Array(6).fill(""))
   const [question, setQuestion] = useState<number>(0)
   const [assessmentResponse, setAssessmentResponse] = useState<AssessmentResponse | null>(null)
@@ -25,7 +25,7 @@ export default function AssessmentPage() {
   const responsesFilled = responses.filter(res => res.trim().length >= 25).length
   const canSubmit = responsesFilled === 6
 
-  const {mutate:submitAssessment} = useMutation({
+  const {isPending:assessmentResponseLoading, mutate:submitAssessment} = useMutation({
     mutationFn: async () => {
       if (!canSubmit || !session) return
       const formattedResponses = responses.map((res, i) => {
@@ -77,7 +77,18 @@ export default function AssessmentPage() {
   }
 
   if (assessmentResponse) {
-    return <AssessmentResult />
+    return <AssessmentResult data={assessmentResponse} />
+  }
+
+  if (assessmentResponseLoading) {
+    return (
+      <div className="bg-muted min-h-svh flex flex-col justify-center items-center">
+        <Loader2 className="size-32 animate-spin"/>
+        <p className="text-xl mt-5">Assessment submitted! Awaiting results...</p>
+        <p className="text-sm mt-5">Results may take up to 1-2 minutes</p>
+        <div className="mt-25"></div>
+      </div>
+    )
   }
 
   return (
@@ -100,7 +111,7 @@ export default function AssessmentPage() {
         <div className="mb-2 text-xl">
           <Textarea
             value={responses[question]}
-            onChange={e => { setResponses(prev => prev.map((value, i) => i === question ? e.target.value : value)) }}
+            onChange={e => { setResponses(prev => prev.map((value, i) => i === question ? e.target.value.slice(0, 500) : value)) }}
             placeholder="Enter your response here..."
             className="resize-none w-full border-2 border-blue-500 p-4 text-lg font-light focus-visible:ring-blue-500 text-left"
           />

@@ -26,6 +26,7 @@ export default function TopBar() {
                 <ul className="flex flex-row gap-x-5 font-normal">
                     <Link href="/">Home</Link>
                     <Link href="/assessment">Assessment</Link>
+                    <Link href="/roadmap">Roadmap</Link>
                     <Link href="/">News</Link>
                     <Link href="/">Account</Link>
                 </ul>
