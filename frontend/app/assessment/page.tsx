@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
-import { createAssessmentQueryOptions } from "@/hooks/query-options"
+import { createAssessmentQueryOptions, createAssessmentCheckQueryOptions } from "@/hooks/query-options"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
@@ -12,14 +12,16 @@ import { FLASK_SERVER } from "@/lib/flask"
 import { authClient } from "@/lib/auth-client"
 import { AssessmentResponse } from "@/components/assessment-result"
 import AssessmentResult from "@/components/assessment-result"
+import Link from "next/link"
 // import { createAssessmentMutationOptions } from "@/hooks/mutation-options"
 
 export default function AssessmentPage() {
 
   const { data:session } = authClient.useSession()
+  const { data:hasCompletedAssessment, isPending:hasCompletedAssessmentLoading } = useQuery(createAssessmentCheckQueryOptions(session?.user.id ?? ""))
   const {data:assessment, isPending:assessmentLoading, error:assessmentError} = useQuery(createAssessmentQueryOptions())
   const [responses, setResponses] = useState<string[]>(new Array(6).fill(""))
-  const [question, setQuestion] = useState<number>(0)
+  const [question, setQuestion] = useState<number>(-1)
   const [assessmentResponse, setAssessmentResponse] = useState<AssessmentResponse | null>(null)
 
   const responsesFilled = responses.filter(res => res.trim().length >= 25).length
@@ -62,10 +64,31 @@ export default function AssessmentPage() {
     submitAssessment()
   }
 
-  if (assessmentLoading) {
+  if (assessmentLoading || hasCompletedAssessmentLoading) {
     return (
-      <div className="min-h-svh flex flex-row justify-center items-center">
-        <Loader2 className="size-8 animate-spin"/>
+      <div className="bg-muted min-h-svh flex flex-row justify-center items-center">
+        <Loader2 className="size-16 animate-spin"/>
+      </div>
+    )
+  }
+
+  if (hasCompletedAssessment) {
+    return (
+      <div className="bg-muted min-h-svh flex flex-col gap-y-4 justify-center items-center">
+        <p>You have already completed the assessment!</p>
+
+        <Link href="/roadmap">
+          <div className="shadow-md rounded-full py-2 px-5 text-x text-white bg-blue-500 hover:bg-blue-600 transition-colors">
+            <span>Go To Roadmap</span>
+          </div>
+        </Link>
+
+
+        {/* <Link href={`/roadmap/lesson/${data.id}`}>
+            <div className="flex flex-row justify-center items-center flex-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white hover:text-white font-bold py-3 text-xl rounded-lg shadow-md transition-colors">
+              <span>{actionButtonText} Lesson</span>
+            </div>
+          </Link> */}
       </div>
     )
   }
@@ -87,6 +110,14 @@ export default function AssessmentPage() {
         <p className="text-xl mt-5">Assessment submitted! Awaiting results...</p>
         <p className="text-sm mt-5">Results may take up to 1-2 minutes</p>
         <div className="mt-25"></div>
+      </div>
+    )
+  }
+
+  if (question === -1) {
+    return (
+      <div className="min-h-screen bg-muted p-6 md:p-8">
+        <Button size="lg" className="bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={() => {setQuestion(0)}}>Begin Assessment</Button>
       </div>
     )
   }

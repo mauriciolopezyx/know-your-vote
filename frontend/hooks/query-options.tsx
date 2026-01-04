@@ -27,6 +27,7 @@ export const createAssessmentQueryOptions = () => {
 
             return data as AssessmentQuestion[]
         },
+        refetchOnWindowFocus: false,
         staleTime: 60 * 1000 * 60 * 12,
         gcTime: 60 * 1000 * 60 * 24
     })
@@ -38,7 +39,7 @@ export const createAssessmentCheckQueryOptions = (userId: string) => {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from("user_assessments")
-                .select("id")
+                .select("*")
                 .eq("user_id", userId)
                 .single()
 
@@ -47,18 +48,42 @@ export const createAssessmentCheckQueryOptions = (userId: string) => {
             }
 
             return !!data
-        }
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 60 * 1000 * 5,
+        gcTime: 60 * 1000 * 10
     })
 }
 
-
+export type Citation = {
+    id: number,
+    card_id: number,
+    created_at: string,
+    citation_text: string,
+    source_name: string,
+    source_url: string
+}
+export type LessonCard = {
+    card_citations: Citation[],
+    card_order: number,
+    card_type: string,
+    content: string,
+    created_at: string,
+    id: number,
+    lesson_id: number,
+    title: string
+}
+export type LessonContent = {
+    lesson: Pick<Lesson, "id" | "title" | "description" | "lesson_order">,
+    cards: LessonCard[]
+}
 export const createLessonContentQueryOptions = (lessonId: number) => {
     return queryOptions({
         queryKey: ["lesson_content", lessonId],
         queryFn: async () => {
             const { data, error } = await supabase
                 .from("lesson_cards")
-                .select(`*, card_citations (*)`)
+                .select(`*, card_citations (*), lessons (id, title, description, lesson_order)`)
                 .eq("lesson_id", lessonId)
                 .order("card_order")
 
@@ -66,8 +91,19 @@ export const createLessonContentQueryOptions = (lessonId: number) => {
                 throw new Error(error.message)
             }
 
-            return data
+            const lessonData = data && data.length > 0 ? data[0].lessons : null
+
+            const response = {
+                lesson: lessonData,
+                cards: data?.map(card => {
+                    const { lessons, ...cardData } = card
+                    return cardData
+                }) || []
+            }
+
+            return response as LessonContent
         },
+        refetchOnWindowFocus: false,
         staleTime: 60 * 1000 * 60 * 12,
         gcTime: 60 * 1000 * 60 * 24
     })
@@ -89,73 +125,93 @@ export const createLessonQuizQueryOptions = (lessonId: number) => {
 
             return data
         },
+        refetchOnWindowFocus: false,
         staleTime: 60 * 1000 * 60 * 12,
         gcTime: 60 * 1000 * 60 * 24
     })
 }
 
 export type LessonRoadmap = {
-  core: LessonWithProgress[]
-  targeted: LessonWithProgress[]
-  optional: LessonWithProgress[]
+  core: Lesson[],
+  targeted: Lesson[],
+  optional: Lesson[]
 }
-export type LessonWithProgress = {
-  id: number
-  title: string
-  description: string
-  lesson_order: number
-  tier: string
-  target_domains: string[]
-  assignment_reason: string
-  assigned_at: string
-  status: string
-  current_card_index: number | null
-  quiz_score: number | null
-  quiz_attempts: number | null
-  completed_at: string | null
+export type Lesson = {
+  id: number,
+  title: string,
+  description: string,
+  lesson_order: number,
+  tier: string,
+  target_domains: string[],
+  assignment_reason: string,
+  assigned_at: string,
+  status: string,
+  quiz_score: number | null,
+  quiz_attempts: number | null,
+  completed_at: string | null,
+  sublessons: number
 }
 export const createLessonRoadmapQueryOptions = (userId: string) =>{
     return queryOptions({
         queryKey: ["user_roadmap", userId],
         queryFn: async () => {
-            const { data, error } = await supabase
-                .from("user_lesson_assignments")
+            const { data: assignments, error: assignmentError } = await supabase
+                .from('user_lesson_assignments')
                 .select(`
                 assignment_reason,
                 assigned_at,
+                lesson_id,
                 lessons (
                     id,
                     title,
                     description,
                     lesson_order,
                     tier,
-                    target_domains
-                ),
-                user_lesson_progress (
-                    status,
-                    current_card_index,
-                    quiz_score,
-                    quiz_attempts,
-                    completed_at
+                    target_domains,
+                    lesson_cards (
+                    card_type
+                    )
                 )
                 `)
-                .eq("user_id", userId)
-                .order("lessons(lesson_order)", { ascending: true })
-
-            if (error) {
-                throw new Error(error.message)
+                .eq('user_id', userId)
+                .order('lessons(lesson_order)', { ascending: true })
+            
+            if (assignmentError) {
+                throw new Error(assignmentError.message)
             }
 
+            // Then, get all progress records for this user
+            const { data: progressRecords, error: progressError } = await supabase
+                .from('user_lesson_progress')
+                .select('lesson_id, status, quiz_score, quiz_attempts, completed_at')
+                .eq('user_id', userId)
+
+            if (progressError) {
+                throw new Error(progressError.message)
+            }
+
+            // Create a map of lesson_id -> progress for quick lookup
+            const progressMap = new Map(
+                progressRecords?.map(p => [p.lesson_id, p]) || []
+            )
+
+            // Organize lessons by tier
             const roadmap: LessonRoadmap = {
                 core: [],
                 targeted: [],
                 optional: []
             }
 
-            data?.forEach((assignment: any) => {
+            assignments?.forEach((assignment: any) => {
                 const lesson = assignment.lessons
-                const progress = assignment.user_lesson_progress?.[0] || {}
-                const lessonWithProgress: LessonWithProgress = {
+                const progress = progressMap.get(assignment.lesson_id)
+                if (!progress) return
+                // Count text cards as sublessons
+                const sublessons = lesson.lesson_cards?.filter(
+                    (card: any) => card.card_type === 'text'
+                ).length || 0
+
+                const lessonWithProgress: Lesson = {
                     id: lesson.id,
                     title: lesson.title,
                     description: lesson.description,
@@ -165,23 +221,26 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
                     assignment_reason: assignment.assignment_reason,
                     assigned_at: assignment.assigned_at,
                     status: progress.status || 'not_started',
-                    current_card_index: progress.current_card_index || null,
                     quiz_score: progress.quiz_score || null,
                     quiz_attempts: progress.quiz_attempts || null,
-                    completed_at: progress.completed_at || null
+                    completed_at: progress.completed_at || null,
+                    sublessons: sublessons
                 }
 
-                if (lesson.tier === "core") {
+                if (lesson.tier === 'core') {
                     roadmap.core.push(lessonWithProgress)
-                } else if (lesson.tier === "targeted") {
+                } else if (lesson.tier === 'targeted') {
                     roadmap.targeted.push(lessonWithProgress)
-                } else if (lesson.tier === "optional") {
+                } else if (lesson.tier === 'optional') {
                     roadmap.optional.push(lessonWithProgress)
                 }
             })
 
             return roadmap
-        }
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 60 * 1000 * 15,
+        gcTime: 60 * 1000 * 30
     })
 }
 
@@ -208,6 +267,9 @@ export const createLessonRoadmapCheckQueryOptions = (userId: string) => {
                 const progress = assignment.user_lesson_progress?.[0]
                 return progress?.status === "completed"
             })
-        }
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 60 * 1000 * 5,
+        gcTime: 60 * 1000 * 10
     })
 }

@@ -1,26 +1,13 @@
 "use client"
 
-export type DomainEvaluation = {
-    domain: string,
-    score: number,
-    gaps_identified: string[],
-    priority: number
-}
-export type AssessmentResponse = {
-    assessment_id: string,
-    classification: string,
-    confidence_score: number,
-    reasoning: string,
-    domain_evaluations: DomainEvaluation[]
-}
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { FaCheckCircle, FaExclamationTriangle, FaBook, FaVoteYea, FaLandmark, FaNewspaper } from "react-icons/fa"
 import Link from "next/link"
 import { Button } from "./ui/button"
+import { formatDomain } from "@/app/roadmap/page"
 
-const getDomainIcon = (domain: string) => {
+export const getDomainIcon = (domain: string) => {
   switch (domain) {
     case "government_structure":
       return <FaLandmark className="w-5 h-5" />
@@ -35,36 +22,36 @@ const getDomainIcon = (domain: string) => {
   }
 }
 
-const formatDomainName = (domain: string) => {
-  return domain
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-}
-
-const formatGapName = (gap: string) => {
-  return gap
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-}
-
-const getScoreColor = (score: number) => {
+export const getScoreColor = (score: number) => {
   if (score >= 0.7) return "text-blue-500"
   if (score >= 0.5) return "text-red-500"
   return "text-red-500"
 }
 
-const getScoreBgColor = (score: number) => {
+export const getScoreBgColor = (score: number) => {
   if (score >= 0.7) return "bg-blue-500"
   if (score >= 0.5) return "bg-red-500"
   return "bg-red-500"
 }
 
-const getPriorityBadge = (priority: number) => {
+export const getPriorityBadge = (priority: number) => {
   if (priority === 1) return <Badge variant="destructive">High Priority</Badge>
   if (priority === 2) return <Badge variant="secondary">Medium Priority</Badge>
   return <Badge variant="outline">Low Priority</Badge>
+}
+
+export type DomainEvaluation = {
+    domain: string,
+    score: number,
+    gaps_identified: string[],
+    priority: number
+}
+export type AssessmentResponse = {
+    assessment_id: string,
+    classification: string,
+    confidence_score: number,
+    reasoning: string,
+    domain_evaluations: DomainEvaluation[]
 }
 
 export default function AssessmentResult({data}: {data: AssessmentResponse}) {
@@ -75,9 +62,11 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
               <CardHeader>
                 <div className="flex flex-row justify-between items-center">
                   <CardTitle className="text-2xl md:text-3xl font-bold">Assessment Results</CardTitle>
-                  <Button variant="outline" className="p-3">
-                    <Link href="/roadmap" className="text-2xl text-blue-400">Go To Roadmap</Link>
-                  </Button>
+                  <Link href="/roadmap">
+                    <div className="border rounded-full px-5 text-xl text-blue-400">
+                      <span>Go To Roadmap</span>
+                    </div>
+                  </Link>
                 </div>
                 <CardDescription>Your civic knowledge evaluation</CardDescription>
               </CardHeader>
@@ -113,7 +102,7 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
 
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex gap-2">
-                          <FaCheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <FaCheckCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                           <div>
                           <p className="text-sm font-bold mb-1 text-blue-900">Analysis</p>
                           <p className="text-sm font-light text-blue-800">{data.reasoning}</p>
@@ -133,7 +122,7 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <div className={`${getScoreColor(domain.score)}`}>{getDomainIcon(domain.domain)}</div>
-                              <CardTitle className="text-lg">{formatDomainName(domain.domain)}</CardTitle>
+                              <CardTitle className="text-lg">{formatDomain(domain.domain)}</CardTitle>
                             </div>
                             {getPriorityBadge(domain.priority)}
                           </div>
@@ -152,7 +141,7 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
                               aria-valuenow={domain.score * 100}
                               aria-valuemin={0}
                               aria-valuemax={100}
-                              aria-label={`Score for ${formatDomainName(domain.domain)}`}
+                              aria-label={`Score for ${formatDomain(domain.domain)}`}
                             >
                               <div
                               className={`${getScoreBgColor(domain.score)} h-full rounded-full transition-all`}
@@ -171,7 +160,7 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
                               {domain.gaps_identified.map((gap, index) => (
                                 <li key={index} className="text-sm font-light text-muted-foreground pl-6 relative">
                                 <span className="absolute left-0">•</span>
-                                {formatGapName(gap)}
+                                {formatDomain(gap)}
                                 </li>
                               ))}
                             </ul>
