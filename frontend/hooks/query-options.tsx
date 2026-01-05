@@ -109,6 +109,19 @@ export const createLessonContentQueryOptions = (lessonId: number) => {
     })
 }
 
+export type LessonQuizQuestion = {
+    correct_answer: "A" | "B" | "C" | "D",
+    created_at: string,
+    explanation: string,
+    id: number,
+    lesson_id: number,
+    option_a: string,
+    option_b: string,
+    option_c: string,
+    option_d: string,
+    question_order: number,
+    question_text: string
+}
 export const createLessonQuizQueryOptions = (lessonId: number) => {
     return queryOptions({
         queryKey: ["lesson_quiz", lessonId],
@@ -123,7 +136,9 @@ export const createLessonQuizQueryOptions = (lessonId: number) => {
                 throw new Error(error.message)
             }
 
-            return data
+            console.log("quiz content rec:", data)
+
+            return data as LessonQuizQuestion[]
         },
         refetchOnWindowFocus: false,
         staleTime: 60 * 1000 * 60 * 12,

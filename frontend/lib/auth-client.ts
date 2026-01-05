@@ -9,3 +9,5 @@ export const signInWithGoogle = async () => {
         provider: "google"
     })
 }
+
+export type Session = typeof authClient.$Infer.Session

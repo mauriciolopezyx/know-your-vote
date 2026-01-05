@@ -13,7 +13,7 @@ import { authClient } from "@/lib/auth-client"
 import { AssessmentResponse } from "@/components/assessment-result"
 import AssessmentResult from "@/components/assessment-result"
 import Link from "next/link"
-// import { createAssessmentMutationOptions } from "@/hooks/mutation-options"
+import { createAssessmentMutationOptions } from "@/hooks/mutation-options"
 
 export default function AssessmentPage() {
 
@@ -25,44 +25,8 @@ export default function AssessmentPage() {
   const [assessmentResponse, setAssessmentResponse] = useState<AssessmentResponse | null>(null)
 
   const responsesFilled = responses.filter(res => res.trim().length >= 25).length
-  const canSubmit = responsesFilled === 6
-
-  const {isPending:assessmentResponseLoading, mutate:submitAssessment} = useMutation({
-    mutationFn: async () => {
-      if (!canSubmit || !session) return
-      const formattedResponses = responses.map((res, i) => {
-        return {"question_id": i+1, "response_text": res}
-      })
-      const response = await fetch(`${FLASK_SERVER}/assess`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "user_id": session.user.id,
-          "responses": formattedResponses
-        })
-      })
-      if (!response.ok) {
-        const payload = await response.text()
-        throw new Error(payload)
-      }
-      return await response.json()
-    },
-    onSuccess: (res) => {
-      setAssessmentResponse(res)
-    }
-  })
-
-  const onQuestionToggle = (increment: number) => {
-    if (increment > 0 && question === 5) return
-    if (increment < 0 && question === 0) return
-    setQuestion(prev => prev + increment)
-  }
-
-  const onAssessmentSubmit = () => {
-    submitAssessment()
-  }
+  const canSubmit = assessment ? responsesFilled === assessment.length : false
+  const {isPending:assessmentResponseLoading, mutate:submitAssessment} = useMutation(createAssessmentMutationOptions(canSubmit, session, responses, (result: any) => {setAssessmentResponse(result)}))
 
   if (assessmentLoading || hasCompletedAssessmentLoading) {
     return (
@@ -82,13 +46,6 @@ export default function AssessmentPage() {
             <span>Go To Roadmap</span>
           </div>
         </Link>
-
-
-        {/* <Link href={`/roadmap/lesson/${data.id}`}>
-            <div className="flex flex-row justify-center items-center flex-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white hover:text-white font-bold py-3 text-xl rounded-lg shadow-md transition-colors">
-              <span>{actionButtonText} Lesson</span>
-            </div>
-          </Link> */}
       </div>
     )
   }
@@ -120,6 +77,16 @@ export default function AssessmentPage() {
         <Button size="lg" className="bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={() => {setQuestion(0)}}>Begin Assessment</Button>
       </div>
     )
+  }
+
+  const onQuestionToggle = (increment: number) => {
+    if (increment > 0 && question >= assessment.length - 1) return
+    if (increment < 0 && question <= 0) return
+    setQuestion(prev => prev + increment)
+  }
+
+  const onAssessmentSubmit = () => {
+    submitAssessment()
   }
 
   return (
@@ -154,20 +121,22 @@ export default function AssessmentPage() {
         </div>
 
         <div className="flex items-center justify-center gap-8">
-          <button
+          <Button
+            disabled={question === 0}
             className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
             aria-label="Previous question"
             onClick={() => {onQuestionToggle(-1)}}
           >
             <FiChevronLeft className="h-6 w-6" />
-          </button>
-          <button
+          </Button>
+          <Button
+            disabled={question === assessment.length - 1}
             className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
             aria-label="Next question"
             onClick={() => {onQuestionToggle(1)}}
           >
             <FiChevronRight className="h-6 w-6" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

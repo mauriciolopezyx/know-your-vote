@@ -98,7 +98,7 @@ export default function LessonViewer() {
 
   if (!lesson) {
     return (
-      <p>idk but should never happen</p>
+      <p>Error loading assessment: No lesson found</p>
     )
   }
 
@@ -120,7 +120,6 @@ export default function LessonViewer() {
   return (
     <div className="min-h-screen bg-muted from-blue-50 to-white p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Lesson Header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 text-blue-500 mb-2">
             <FaBook className="text-xl" />
@@ -137,84 +136,77 @@ export default function LessonViewer() {
           <p className="font-light leading-relaxed">{lesson.lesson.description}</p>
         </div>
 
-        {/* Main Content Area */}
         <div className="relative">
-          {/* Navigation Buttons */}
           <div className="absolute left-[-30] top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-10">
-          <Button
+            <Button
               onClick={goToPrevious}
               disabled={currentSublesson === 0}
               variant="outline"
               size="icon"
               className="cursor-pointer h-12 w-12 rounded-full shadow-lg hover:bg-blue-50 disabled:opacity-30 disabled:cursor-not-allowed border-2 border-blue-500"
               aria-label="Previous sublesson"
-          >
-              <FaChevronLeft className="text-blue-500" />
-          </Button>
+            >
+                <FaChevronLeft className="text-blue-500" />
+            </Button>
           </div>
 
           <div className="absolute right-[-30] top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-10">
-          <Button
+            <Button
               onClick={goToNext}
               disabled={currentSublesson === totalSublessons - 1}
               variant="outline"
               size="icon"
               className="cursor-pointer h-12 w-12 rounded-full shadow-lg hover:bg-blue-50 disabled:opacity-30 disabled:cursor-not-allowed border-2 border-blue-500"
               aria-label="Next sublesson"
-          >
-              <FaChevronRight className="text-blue-500" />
-          </Button>
+            >
+                <FaChevronRight className="text-blue-500" />
+            </Button>
           </div>
 
-          {/* Content Cards */}
           <div className="space-y-6">
-          {/* Text Card */}
-          <UI_Card className="p-6 md:p-8 shadow-lg border-l-4 border-l-blue-500">
+            <UI_Card className="p-6 md:p-8 shadow-lg border-l-4 border-l-blue-500">
               <h2 className="text-2xl font-bold">{sublesson.textCard.title}</h2>
               <div className="font-light space-y-4">{renderContent(sublesson.textCard.content)}</div>
-          </UI_Card>
+            </UI_Card>
 
-          {/* Key Concept Card */}
-          {sublesson.keyConceptCard && (
+            {sublesson.keyConceptCard && (
               <UI_Card className="p-6 md:p-8 border-2 border-blue-500 shadow-lg">
               <div className="flex items-center gap-3">
-                  <div className="bg-blue-500 p-2 rounded-lg">
-                  <FaLightbulb className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-xl font-bold">Key Concept: {sublesson.keyConceptCard.title}</h3>
+                <div className="bg-blue-500 p-2 rounded-lg">
+                <FaLightbulb className="text-white text-xl" />
+                </div>
+                <h3 className="text-xl font-bold">Key Concept: {sublesson.keyConceptCard.title}</h3>
               </div>
               <div className="font-light space-y-4">{renderContent(sublesson.keyConceptCard.content)}</div>
               </UI_Card>
-          )}
+            )}
 
-          {/* Citations */}
-          {allCitations.length > 0 && (
+            {allCitations.length > 0 && (
               <UI_Card className="p-4 md:p-6 border border-gray-200">
               <h4 className="text-sm font-bold uppercase tracking-wide mb-3">Sources & Citations</h4>
               <div className="space-y-2">
-                  {allCitations.map((citation) => (
-                  <div key={citation.id} className="flex items-start gap-2 text-sm">
-                      <FaExternalLinkAlt className="text-blue-500 mt-1 shrink-0" />
-                      <div>
-                      <a
-                          href={citation.source_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-700 font-medium hover:underline"
-                      >
-                          {citation.source_name}
-                      </a>
-                      <p className="font-light mt-1">{citation.citation_text}</p>
-                      </div>
-                  </div>
-                  ))}
+                {allCitations.map((citation) => (
+                <div key={citation.id} className="flex items-start gap-2 text-sm">
+                    <FaExternalLinkAlt className="text-blue-500 mt-1 shrink-0" />
+                    <div>
+                    <a
+                        href={citation.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 font-medium hover:underline"
+                    >
+                        {citation.source_name}
+                    </a>
+                    <p className="font-light mt-1">{citation.citation_text}</p>
+                    </div>
+                </div>
+                ))}
               </div>
               </UI_Card>
-          )}
+            )}
           </div>
         </div>
 
-        {/* Progress Indicator */}
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full shadow-md border">
             <span className="font-light text-sm">
