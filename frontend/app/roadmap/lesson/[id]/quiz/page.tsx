@@ -1,10 +1,12 @@
 "use client"
 
+import { SubmitLessonQuiz } from "@/actions/db"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { createLessonQuizQueryOptions, LessonQuizQuestion } from "@/hooks/query-options"
 import { useQuery } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
@@ -14,9 +16,8 @@ export default function LessonQuiz() {
     const params = useParams<{ id: string }>()
     const { data:quiz, isPending:quizLoading, error:quizError} = useQuery(createLessonQuizQueryOptions(Number(params.id)))
 
-    const [currentStage, setCurrentStage] = useState<number>(-1) // -1 = answering, 0 = review
+    const [currentStage, setCurrentStage] = useState<number>(-1) // -1 = answering, 0 = failed, 1 = passed
     const [questionIndex, setQuestionIndex] = useState<number>(0)
-
     const [userAnswers, setUserAnswers] = useState<Record<number, "A" | "B" | "C" | "D">>({})
 
     if (quizLoading) {
@@ -27,7 +28,7 @@ export default function LessonQuiz() {
         )
     }
 
-    if (!quiz) {
+    if (!quiz || quizError) {
         return (
             <p>Error loading quiz: No quiz found</p>
         )
@@ -39,7 +40,7 @@ export default function LessonQuiz() {
     const answeredCount = Object.keys(userAnswers).length
     const totalQuestions = quiz.length
     const progressValue = (answeredCount / totalQuestions) * 100
-    const canSubmit = answeredCount === totalQuestions
+    const canSubmit = answeredCount === totalQuestions && currentStage === -1
 
     const onQuestionToggle = (increment: number) => {
         if (increment > 0 && questionIndex >= quiz.length - 1) return
@@ -48,46 +49,68 @@ export default function LessonQuiz() {
     }
 
     const handleAnswerSelect = (answer: "A" | "B" | "C" | "D") => {
+        if (currentStage != -1) return
         setUserAnswers((prev) => ({
             ...prev,
             [currentQuestion.id]: answer,
         }))
     }
 
-    const getOptionClass = (option: "A" | "B" | "C" | "D") => {
-    const isSelected = selectedAnswer === option
-    const isCorrect = option === currentQuestion.correct_answer
-    const userWasWrong = selectedAnswer !== currentQuestion.correct_answer
-
-    if (currentStage === -1) {
-        if (isSelected) {
-            return "border-blue-500 bg-blue-50"
-        }
-        return "border-gray-300 hover:border-blue-300 hover:bg-blue-50"
-    } else {
-        if (isSelected && !isCorrect && userWasWrong) {
-            return "border-red-500 bg-red-50"
-        }
-        if (isCorrect && userWasWrong) {
-            return "border-blue-500 bg-blue-50"
-        }
-        if (isSelected && isCorrect) {
-            return "border-blue-500 bg-blue-50"
-        }
-        return "border-gray-300"
+    const handleStartLesson = async () => {
+        const { passed } = await SubmitLessonQuiz({ lessonId: Number(params.id), answers: userAnswers })
+        setCurrentStage(passed ? 1 : 0)
+        setQuestionIndex(0)
     }
+
+    const handleRestartLesson = () => {
+        setCurrentStage(-1)
+        setQuestionIndex(0)
+        setUserAnswers({})
+    }
+
+    const getOptionClass = (option: "A" | "B" | "C" | "D") => {
+        const isSelected = selectedAnswer === option
+        const isCorrect = option === currentQuestion.correct_answer
+        const userWasWrong = selectedAnswer !== currentQuestion.correct_answer
+
+        if (currentStage === -1) {
+            if (isSelected) {
+                return "border-blue-500 bg-blue-50 dark:bg-blue-500"
+            }
+            return "border-gray-300 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-400"
+        } else {
+            if (isSelected && !isCorrect && userWasWrong) {
+                return "border-red-500 bg-red-50 dark:bg-red-500"
+            }
+            if (isCorrect && userWasWrong) {
+                return "border-blue-500 bg-blue-50 dark:bg-blue-500"
+            }
+            if (isSelected && isCorrect) {
+                return "border-green-500 bg-green-50 dark:bg-green-500"
+            }
+            return "border-gray-300"
+        }
     }
 
     return (
-        <div className="min-h-screen bg-white p-6 md:p-8">
+        <div className="min-h-screen bg-muted p-6 md:p-8">
             <div className="mx-auto max-w-4xl">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-blue-500">Lesson {params.id} Quiz</h1>
+                    {currentStage != -1 ? <h2 className="text-xl font-normal">{currentStage === 0 ? "You didn't pass, try again!" : "Congratulations, you passed!"}</h2> : null}
                 </div>
 
                 <div className="mb-12 flex items-center justify-center gap-4">
-                    <Progress value={progressValue} className="w-full max-w-2xl" />
-                    {canSubmit ? <Button size="lg" className="bg-blue-500 text-white text-xl hover:bg-blue-600">Submit</Button> : null}
+                    <Progress value={progressValue} className={`w-full max-w-2xl ${currentStage === -1 ? "[&>div]:bg-blue-500" : currentStage === 0 ? "[&>div]:bg-red-500" : "[&>div]:bg-green-500"}`} />
+                    {canSubmit ? <Button size="lg" className="cursor-pointer bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={handleStartLesson}>Submit</Button> : null}
+                    {currentStage === 1 ? (
+                        <Link href="/roadmap">
+                            <div className="shadow-md rounded-full py-2 px-5 text-x text-white bg-green-500 hover:bg-green-600 transition-colors">
+                                <span>Go To Roadmap</span>
+                            </div>
+                        </Link>
+                    ) : null}
+                    {currentStage === 0 ? <Button size="lg" className="cursor-pointer bg-red-500 text-white text-xl hover:bg-red-600" onClick={handleRestartLesson}>Retry Quiz</Button> : null}
                 </div>
 
                 <div className="mb-6 flex items-start gap-4">
@@ -116,10 +139,10 @@ export default function LessonQuiz() {
                     })}
                 </div>
 
-                {currentStage !== -1 && selectedAnswer !== currentQuestion.correct_answer && (
-                    <div className="mb-12 rounded-lg border-2 border-blue-500 bg-blue-50 p-4">
-                        <p className="font-bold text-blue-500">Explanation:</p>
-                        <p className="text-foreground">{currentQuestion.explanation}</p>
+                {currentStage != -1 && selectedAnswer !== currentQuestion.correct_answer && (
+                    <div className="mb-12 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-500 p-4">
+                        <p className="font-bold text-blue-500 dark:text-white">Explanation:</p>
+                        <p className="font-light text-foreground">{currentQuestion.explanation}</p>
                     </div>
                 )}
 

@@ -127,11 +127,13 @@ export default function LessonViewer() {
           </div>
           <div className="flex flex-row justify-between items-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{lesson.lesson.title}</h1>
-            {currentSublesson === totalSublessons - 1 ? <Link href={`/roadmap/lesson/${params.id}`}>
-              <div className="flex flex-row justify-center items-center flex-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white hover:text-white font-bold px-6 py-2 text-xl rounded-lg shadow-md transition-colors">
-                <span>Start Quiz</span>
-              </div>
-            </Link> : null}
+            {currentSublesson === totalSublessons - 1 ? (
+              <Link href={`/roadmap/lesson/${params.id}/quiz`}>
+                <div className="shadow-md rounded-full py-2 px-5 text-x text-white bg-red-500 hover:bg-red-600 transition-colors">
+                  <span>Start Quiz</span>
+                </div>
+              </Link>
+            ): null}
           </div>
           <p className="font-light leading-relaxed">{lesson.lesson.description}</p>
         </div>

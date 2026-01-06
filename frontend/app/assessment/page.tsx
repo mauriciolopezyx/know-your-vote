@@ -97,7 +97,7 @@ export default function AssessmentPage() {
 
         <div className="mb-12 flex items-center justify-center gap-4">
           <Progress value={(responsesFilled / 6) * 100} className="w-full max-w-2xl [&>div]:bg-red-500" />
-          {canSubmit ? <Button size="lg" className="bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={onAssessmentSubmit}>Submit</Button> : null}
+          {canSubmit ? <Button size="lg" className="cursor-pointer bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={onAssessmentSubmit}>Submit</Button> : null}
         </div>
 
         <div className="mb-6 flex items-start gap-4">

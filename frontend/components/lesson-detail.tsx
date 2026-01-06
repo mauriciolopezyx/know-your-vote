@@ -5,8 +5,7 @@ import { Card as UI_Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Lesson } from "@/hooks/query-options"
 import { getStatusConfig, getTierColor, getTierBadgeColor, formatDomain } from "@/app/roadmap/page"
-import { updateLessonProgress } from "@/actions/db"
-import { authClient } from "@/lib/auth-client"
+import { StartLesson } from "@/actions/db"
 
 export function getActionButton(status: string): string {
   switch (status) {
@@ -38,15 +37,13 @@ interface LessonDetailProps {
 
 export default function LessonDetail({ data, onBack }: LessonDetailProps) {
 
-  const { data:session } = authClient.useSession()
   const statusConfig = getStatusConfig(data.status)
   const tierColor = getTierColor(data.tier)
   const tierBadgeColor = getTierBadgeColor(data.tier)
   const actionButtonText = getActionButton(data.status)
 
   const handleStartLesson = async () => {
-    if (!session) return
-    updateLessonProgress({lessonId: data.id, stage: 1})
+    StartLesson({ lessonId: data.id })
   }
 
   return (
