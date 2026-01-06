@@ -5,7 +5,8 @@ import { Card as UI_Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Lesson } from "@/hooks/query-options"
 import { getStatusConfig, getTierColor, getTierBadgeColor, formatDomain } from "@/app/roadmap/page"
-import Link from "next/link"
+import { updateLessonProgress } from "@/actions/db"
+import { authClient } from "@/lib/auth-client"
 
 export function getActionButton(status: string): string {
   switch (status) {
@@ -36,12 +37,17 @@ interface LessonDetailProps {
 }
 
 export default function LessonDetail({ data, onBack }: LessonDetailProps) {
+
+  const { data:session } = authClient.useSession()
   const statusConfig = getStatusConfig(data.status)
   const tierColor = getTierColor(data.tier)
   const tierBadgeColor = getTierBadgeColor(data.tier)
   const actionButtonText = getActionButton(data.status)
 
-  console.log(data.lesson_order)
+  const handleStartLesson = async () => {
+    if (!session) return
+    updateLessonProgress({lessonId: data.id, stage: 1})
+  }
 
   return (
     <div className="min-h-screen bg-muted p-6 md:p-10">
@@ -125,12 +131,12 @@ export default function LessonDetail({ data, onBack }: LessonDetailProps) {
               ))}
             </div>
           </div>
-          
-          <Link href={`/roadmap/lesson/${data.id}`}>
+            
+          <Button variant="ghost" onClick={handleStartLesson}>
             <div className="flex flex-row justify-center items-center flex-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white hover:text-white font-bold py-3 text-xl rounded-lg shadow-md transition-colors">
               <span>{actionButtonText} Lesson</span>
             </div>
-          </Link>
+          </Button>
         </UI_Card>
       </div>
     </div>

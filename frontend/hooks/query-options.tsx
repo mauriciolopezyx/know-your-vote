@@ -1,7 +1,7 @@
 "use client"
 
 import { queryOptions } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase-client"
 
 // access the queryKey by .queryKey of any options object, rather than making a new file with string to key mappings
 
@@ -39,11 +39,10 @@ export const createAssessmentCheckQueryOptions = (userId: string) => {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from("user_assessments")
-                .select("*")
-                .eq("user_id", userId)
-                .single()
+                .select("id")
+                .maybeSingle()
 
-            if (error && error.code !== "PGRST116") { // PGRST116 = no rows returned
+            if (error) {
                 throw new Error(error.message)
             }
 
@@ -160,7 +159,7 @@ export type Lesson = {
   target_domains: string[],
   assignment_reason: string,
   assigned_at: string,
-  status: string,
+  status: "not_started" | "in_progress" | "completed",
   quiz_score: number | null,
   quiz_attempts: number | null,
   completed_at: string | null,
@@ -170,6 +169,7 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
     return queryOptions({
         queryKey: ["user_roadmap", userId],
         queryFn: async () => {
+            console.log("remounted")
             const { data: assignments, error: assignmentError } = await supabase
                 .from('user_lesson_assignments')
                 .select(`
@@ -195,7 +195,6 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
                 throw new Error(assignmentError.message)
             }
 
-            // Then, get all progress records for this user
             const { data: progressRecords, error: progressError } = await supabase
                 .from('user_lesson_progress')
                 .select('lesson_id, status, quiz_score, quiz_attempts, completed_at')
@@ -205,12 +204,10 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
                 throw new Error(progressError.message)
             }
 
-            // Create a map of lesson_id -> progress for quick lookup
             const progressMap = new Map(
                 progressRecords?.map(p => [p.lesson_id, p]) || []
             )
 
-            // Organize lessons by tier
             const roadmap: LessonRoadmap = {
                 core: [],
                 targeted: [],
@@ -221,7 +218,6 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
                 const lesson = assignment.lessons
                 const progress = progressMap.get(assignment.lesson_id)
                 if (!progress) return
-                // Count text cards as sublessons
                 const sublessons = lesson.lesson_cards?.filter(
                     (card: any) => card.card_type === 'text'
                 ).length || 0
@@ -235,7 +231,7 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
                     target_domains: lesson.target_domains || [],
                     assignment_reason: assignment.assignment_reason,
                     assigned_at: assignment.assigned_at,
-                    status: progress.status || 'not_started',
+                    status: progress.status || "not_started",
                     quiz_score: progress.quiz_score || null,
                     quiz_attempts: progress.quiz_attempts || null,
                     completed_at: progress.completed_at || null,
@@ -254,6 +250,7 @@ export const createLessonRoadmapQueryOptions = (userId: string) =>{
             return roadmap
         },
         refetchOnWindowFocus: false,
+        refetchOnMount: "always",
         staleTime: 60 * 1000 * 15,
         gcTime: 60 * 1000 * 30
     })
@@ -277,7 +274,6 @@ export const createLessonRoadmapCheckQueryOptions = (userId: string) => {
                 return false
             }
 
-            // Check if all required lessons have status = 'completed'
             return data.every((assignment: any) => {
                 const progress = assignment.user_lesson_progress?.[0]
                 return progress?.status === "completed"

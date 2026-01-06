@@ -28,7 +28,7 @@ export default function TopBar() {
                     <Link href="/assessment">Assessment</Link>
                     <Link href="/roadmap">Roadmap</Link>
                     <Link href="/">News</Link>
-                    <Link href="/">Account</Link>
+                    <Link href="/account">Account</Link>
                 </ul>
             </nav>
             <div className="flex flex-row gap-x-4">

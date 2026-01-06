@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query"
 import { createAssessmentCheckQueryOptions, createLessonRoadmapQueryOptions } from "@/hooks/query-options"
 import { Loader2 } from "lucide-react"
 import { FaLock } from "react-icons/fa"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import LessonDetail from "@/components/lesson-detail"
 import { Lesson } from "@/hooks/query-options"
@@ -87,8 +86,6 @@ export default function LessonRoadmap() {
   const { data:roadmap, isPending:roadmapLoading, error:roadmapError} = useQuery(createLessonRoadmapQueryOptions(session?.user.id ?? ""))
 
   const [lessonDetail, setLessonDetail] = useState<Lesson | null>(null)
-
-  console.log(roadmap)
 
   if (lessonDetail) {
     return <LessonDetail data={lessonDetail} onBack={() => { setLessonDetail(null) }}/>

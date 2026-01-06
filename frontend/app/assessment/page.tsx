@@ -8,7 +8,6 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
-import { FLASK_SERVER } from "@/lib/flask"
 import { authClient } from "@/lib/auth-client"
 import { AssessmentResponse } from "@/components/assessment-result"
 import AssessmentResult from "@/components/assessment-result"
@@ -123,7 +122,8 @@ export default function AssessmentPage() {
         <div className="flex items-center justify-center gap-8">
           <Button
             disabled={question === 0}
-            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
+            variant="ghost"
+            className="cursor-pointer flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
             aria-label="Previous question"
             onClick={() => {onQuestionToggle(-1)}}
           >
@@ -131,7 +131,8 @@ export default function AssessmentPage() {
           </Button>
           <Button
             disabled={question === assessment.length - 1}
-            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
+            variant="ghost"
+            className="cursor-pointer flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-500 text-blue-500 transition-colors hover:bg-blue-50"
             aria-label="Next question"
             onClick={() => {onQuestionToggle(1)}}
           >

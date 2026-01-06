@@ -2,6 +2,8 @@ import { mutationOptions } from "@tanstack/react-query"
 import { FLASK_SERVER } from "@/lib/flask"
 import { Session } from "@/lib/auth-client"
 
+// really, this is only going to be used for flask related endpoints, since we can utilize Server Actions for Supabase mutations (see actions/db.ts)
+
 export const createAssessmentMutationOptions = (canSubmit: boolean, session: any & Session, responses: string[], onSuccessHandler?: (result: any) => any) => {
     return mutationOptions({
         mutationFn: async () => {
@@ -12,11 +14,11 @@ export const createAssessmentMutationOptions = (canSubmit: boolean, session: any
             const response = await fetch(`${FLASK_SERVER}/assess`, {
                 method: "POST",
                 headers: {
-                "Content-Type": "application/json"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                "user_id": session.user.id,
-                "responses": formattedResponses
+                    "user_id": session.user.id,
+                    "responses": formattedResponses
                 })
             })
             if (!response.ok) {
