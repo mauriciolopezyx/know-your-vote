@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { FaCheckCircle, FaExclamationTriangle, FaBook, FaVoteYea, FaLandmark, FaNewspaper } from "react-icons/fa"
 import Link from "next/link"
-import { Button } from "./ui/button"
-import { formatDomain } from "@/app/roadmap/page"
+import { formatDomain } from "../roadmap/roadmap"
 
 export const getDomainIcon = (domain: string) => {
   switch (domain) {

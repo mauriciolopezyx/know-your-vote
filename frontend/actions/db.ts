@@ -30,7 +30,7 @@ export async function StartLesson(formData: StartLessonFormData) {
 
     const { data: existing, error } = await supabase
         .from("user_lesson_progress")
-        .select("id")
+        .select("id, status")
         .eq("user_id", userId)
         .eq("lesson_id", formData.lessonId)
         .maybeSingle()
@@ -40,6 +40,9 @@ export async function StartLesson(formData: StartLessonFormData) {
     }
 
     if (existing) {
+        if (existing.status === "completed") {
+            redirect(`/roadmap/lesson/${formData.lessonId}`)
+        }
         await supabase
             .from("user_lesson_progress")
             .update({

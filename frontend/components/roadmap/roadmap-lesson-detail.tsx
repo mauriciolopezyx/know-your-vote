@@ -4,7 +4,7 @@ import { FaBook, FaArrowLeft } from "react-icons/fa"
 import { Card as UI_Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Lesson } from "@/hooks/query-options"
-import { getStatusConfig, getTierColor, getTierBadgeColor, formatDomain } from "@/app/roadmap/page"
+import { getStatusConfig, getTierColor, getTierBadgeColor, formatDomain } from "@/components/roadmap/roadmap"
 import { StartLesson } from "@/actions/db"
 
 export function getActionButton(status: string): string {
@@ -30,12 +30,12 @@ export function formatDate(dateString: string | null): string {
   })
 }
 
-interface LessonDetailProps {
+interface RoadmapLessonDetailProps {
   data: Lesson
   onBack?: () => void
 }
 
-export default function LessonDetail({ data, onBack }: LessonDetailProps) {
+export default function RoadmapLessonDetail({ data, onBack }: RoadmapLessonDetailProps) {
 
   const statusConfig = getStatusConfig(data.status)
   const tierColor = getTierColor(data.tier)
