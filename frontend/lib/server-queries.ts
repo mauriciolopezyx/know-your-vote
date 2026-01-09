@@ -1,5 +1,9 @@
 import { createClient } from "./supabase-server"
-import { LessonRoadmap, Lesson, LessonContent, AssessmentQuestion, LessonQuizQuestion } from "@/hooks/query-options"
+import { LessonRoadmap, Lesson, LessonContent, AssessmentQuestion, LessonQuizQuestion, Official } from "@/hooks/query-options"
+
+export function isPromiseFulfilled<T>(res: PromiseSettledResult<T>): res is PromiseFulfilledResult<T> {
+  return res.status === "fulfilled"
+}
 
 export async function getLessonQuiz(lessonId: number): Promise<LessonQuizQuestion[]> {
     const supabase = await createClient()
@@ -152,4 +156,19 @@ export async function getUserLessonRoadmap(userId: string): Promise<LessonRoadma
     })
 
     return roadmap
+}
+
+export async function getCongressionalMemberInfo(bioguideId: string): Promise<Official> {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from("federal_officials")
+        .select("*")
+        .eq("bioguide_id", bioguideId)
+        .single()
+
+    if (error) {
+        throw new Error(error.message)
+    }
+
+    return data as Official
 }

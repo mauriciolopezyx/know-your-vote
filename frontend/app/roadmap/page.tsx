@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth"
-import { hasCompletedAssessment, getUserLessonRoadmap } from "@/lib/server-queries"
+import { hasCompletedAssessment, getUserLessonRoadmap, isPromiseFulfilled } from "@/lib/server-queries"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import Roadmap from "@/components/roadmap/roadmap"
+import { LessonRoadmap } from "@/hooks/query-options"
 
 export default async function RoadmapPage() {
     const session = await auth.api.getSession({
@@ -13,15 +14,21 @@ export default async function RoadmapPage() {
         redirect("/login")
     }
 
-    const [hasCompleted, roadmap] = await Promise.all([
-        hasCompletedAssessment(session.user.id),
-        getUserLessonRoadmap(session.user.id)
-    ])
+    const promises: Promise<any>[] = [getUserLessonRoadmap(session.user.id), hasCompletedAssessment(session.user.id)]
+    const results = await Promise.allSettled(promises)
+
+    if (!results.every(isPromiseFulfilled)) {
+        return (
+            <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+                <p>Failed to retrieve roadmap: Does not exist</p>
+            </div>
+        )
+    }
 
     return (
         <Roadmap 
-            roadmap={roadmap}
-            hasCompletedAssessment={hasCompleted}
+            roadmap={results[0].value}
+            hasCompletedAssessment={results[1].value}
         />
     )
 }

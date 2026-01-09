@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { LessonCard } from "@/hooks/query-options"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-import { getLessonContent } from "@/lib/server-queries"
+import { getLessonContent, isPromiseFulfilled } from "@/lib/server-queries"
 import Lesson, { Sublesson } from "@/components/roadmap/lesson/lesson"
 
 function createSublessons(cards: LessonCard[]): Sublesson[] {
@@ -42,15 +42,22 @@ export default async function LessonPage({ params }: { params: {id: string} }) {
     redirect("/login")
   }
   
-  const [lesson] = await Promise.all([
-    getLessonContent(Number(id))
-  ])
+  const promises: Promise<any>[] = [getLessonContent(Number(id))]
+  const results = await Promise.allSettled(promises)
 
-  const sublessons: Sublesson[] = createSublessons(lesson.cards)
+  if (!results.every(isPromiseFulfilled)) {
+    return (
+      <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+        <p>Failed to retrieve lesson: Does not exist</p>
+      </div>
+    )
+  }
+
+  const sublessons: Sublesson[] = createSublessons(results[0].value.cards)
 
   return (
     <Lesson
-      lesson={lesson}
+      lesson={results[0].value}
       sublessons={sublessons}
     />
   )

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-import { getLessonQuiz } from "@/lib/server-queries"
+import { getLessonQuiz, isPromiseFulfilled } from "@/lib/server-queries"
 import LessonQuiz from "@/components/roadmap/lesson/quiz/lesson-quiz"
 
 export default async function LessonQuizPage({ params }: { params: {id: string} }) {
@@ -14,13 +14,20 @@ export default async function LessonQuizPage({ params }: { params: {id: string} 
         redirect("/login")
     }
 
-    const [quiz] = await Promise.all([
-        getLessonQuiz(Number(id))
-    ])
+    const promises = [getLessonQuiz(Number(id))]
+    const results = await Promise.allSettled(promises)
+
+    if (!results.every(isPromiseFulfilled)) {
+        return (
+            <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+                <p>Failed to retrieve lesson quiz: Does not exist</p>
+            </div>
+        )
+    }
 
     return (
         <LessonQuiz
-            quiz={quiz}
+            quiz={results[0].value}
         />
     )
 }

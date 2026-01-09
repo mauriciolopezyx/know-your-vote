@@ -284,3 +284,176 @@ export const createLessonRoadmapCheckQueryOptions = (userId: string) => {
         gcTime: 60 * 1000 * 10
     })
 }
+
+export type Official = {
+  id: string
+  bioguide_id: string
+  first_name: string
+  last_name: string
+  middle_name: string | null
+  full_name: string
+  honorific: string | null
+  chamber: string
+  state: string
+  state_code: string
+  district: number | null
+  party: string
+  office_address: string | null
+  phone_number: string | null
+  official_website: string | null
+  image_url: string | null
+  image_attribution: string | null
+  birth_year: string | null
+  current_member: boolean
+  first_term_start: number
+  current_term_start: number
+  congress_api_updated_at: string
+  created_at: string
+  updated_at: string
+}
+export type ApiResponse = {
+  officials: Official[]
+  total: number
+  page: number
+  totalPages: number
+}
+export type OfficialFilters = {
+  page?: number
+  limit?: number
+  chamber?: "Senate" | "House of Representatives" | "all"
+  state?: string
+  party?: "Democratic" | "Republican" | "Independent" | "all"
+  district?: string
+  birthYear?: string
+  birthYearFilter?: "exact" | "before" | "after"
+  firstTermYear?: string
+  firstTermFilter?: "exact" | "before" | "after"
+  currentTermYear?: string
+  currentTermFilter?: "exact" | "before" | "after"
+  name?: string
+}
+export const createDirectoryQueryOptions = (filters: OfficialFilters) => {
+    return queryOptions({
+        queryKey: ["directory", filters],
+        queryFn: async () => {
+            const {
+                page = 1,
+                limit = 50,
+                chamber,
+                state,
+                party,
+                district,
+                birthYear,
+                birthYearFilter = "exact",
+                firstTermYear,
+                firstTermFilter = "exact",
+                currentTermYear,
+                currentTermFilter = "exact",
+                name=""
+            } = filters
+
+            const from = (page - 1) * limit
+            const to = from + limit - 1
+
+            let query = supabase
+                .from("federal_officials")
+                .select("*", { count: "exact" })
+                .eq("current_member", true)
+                .order("last_name", { ascending: true })
+                .range(from, to)
+
+            if (name) {
+                query = query.ilike("full_name", `%${name}%`)
+            }
+            // Apply filters
+            if (chamber && chamber != "all") {
+                query = query.eq("chamber", chamber)
+            }
+
+            if (state && state.trim() !== "") {
+                // Search by state name OR state code
+                const stateUpper = state.trim().toUpperCase()
+                query = query.or(`state.ilike.%${state}%,state_code.eq.${stateUpper}`)
+            }
+
+            if (party && party != "all") {
+                query = query.eq("party", party)
+            }
+
+            if (district && district.trim() !== "") {
+                const districtNum = parseInt(district)
+                if (!isNaN(districtNum)) {
+                query = query.eq("district", districtNum)
+                }
+            }
+
+            // Birth year filter
+            if (birthYear && birthYear.trim() !== "") {
+                const year = birthYear.trim()
+                switch (birthYearFilter) {
+                case "exact":
+                    query = query.eq("birth_year", year)
+                    break
+                case "before":
+                    query = query.lt("birth_year", year)
+                    break
+                case "after":
+                    query = query.gt("birth_year", year)
+                    break
+                }
+            }
+
+            // First term start filter
+            if (firstTermYear && firstTermYear.trim() !== "") {
+                const year = parseInt(firstTermYear)
+                if (!isNaN(year)) {
+                switch (firstTermFilter) {
+                    case "exact":
+                    query = query.eq("first_term_start", year)
+                    break
+                    case "before":
+                    query = query.lt("first_term_start", year)
+                    break
+                    case "after":
+                    query = query.gt("first_term_start", year)
+                    break
+                }
+                }
+            }
+
+            // Current term start filter
+            if (currentTermYear && currentTermYear.trim() !== "") {
+                const year = parseInt(currentTermYear)
+                if (!isNaN(year)) {
+                switch (currentTermFilter) {
+                    case "exact":
+                    query = query.eq("current_term_start", year)
+                    break
+                    case "before":
+                    query = query.lt("current_term_start", year)
+                    break
+                    case "after":
+                    query = query.gt("current_term_start", year)
+                    break
+                }
+                }
+            }
+
+            const { data, error, count } = await query
+
+            if (error) {
+                throw new Error(error.message)
+            }
+
+            return {
+                officials: data || [],
+                total: count || 0,
+                page,
+                totalPages: Math.ceil((count || 0) / limit)
+            }
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 60 * 1000 * 60 * 5,
+        gcTime: 60 * 1000 * 60 * 10
+    })
+}
