@@ -360,16 +360,16 @@ export default function CongressionalDirectory() {
                             {/* Phone */}
                             {official.phone_number && (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <FiPhone className="w-4 h-4 shrink-0" />
-                                <span>{official.phone_number}</span>
+                                    <FiPhone className="w-4 h-4 shrink-0" />
+                                    <span className="font-normal">{official.phone_number}</span>
                                 </div>
                             )}
 
                             {/* Term Info */}
                             <div className="flex items-start gap-2 text-sm text-muted-foreground">
                                 <FiCalendar className="w-4 h-4 mt-0.5 shrink-0" />
-                                <span>
-                                First Term: {official.first_term_start}
+                                <span className="font-light">
+                                    First Term: <span className="font-normal">{official.first_term_start}</span>
                                 </span>
                             </div>
                             </div>

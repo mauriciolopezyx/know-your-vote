@@ -6,7 +6,7 @@ import { useState, type JSX } from "react" // Import JSX to fix the undeclared v
 import { FaLock } from "react-icons/fa"
 import Link from "next/link"
 import RoadmapLessonDetail from "@/components/roadmap/roadmap-lesson-detail"
-import { Lesson, LessonRoadmap } from "@/hooks/query-options"
+import { Lesson, LessonRoadmap } from "@/types/queries"
 
 export function getTierColor(tier: string): string {
   switch (tier) {

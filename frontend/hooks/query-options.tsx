@@ -5,13 +5,6 @@ import { supabase } from "@/lib/supabase-client"
 
 // access the queryKey by .queryKey of any options object, rather than making a new file with string to key mappings
 
-export type AssessmentQuestion = {
-  id: number
-  question_text: string
-  domain: string
-  question_order: number
-  created_at: string
-}
 // export const createAssessmentQueryOptions = () => {
 //     return queryOptions({
 //         queryKey: ["assessment_questions"],
@@ -54,28 +47,6 @@ export type AssessmentQuestion = {
 //     })
 // }
 
-export type Citation = {
-    id: number,
-    card_id: number,
-    created_at: string,
-    citation_text: string,
-    source_name: string,
-    source_url: string
-}
-export type LessonCard = {
-    card_citations: Citation[],
-    card_order: number,
-    card_type: string,
-    content: string,
-    created_at: string,
-    id: number,
-    lesson_id: number,
-    title: string
-}
-export type LessonContent = {
-    lesson: Pick<Lesson, "id" | "title" | "description" | "lesson_order">,
-    cards: LessonCard[]
-}
 // export const createLessonContentQueryOptions = (lessonId: number) => {
 //     return queryOptions({
 //         queryKey: ["lesson_content", lessonId],
@@ -108,19 +79,6 @@ export type LessonContent = {
 //     })
 // }
 
-export type LessonQuizQuestion = {
-    correct_answer: "A" | "B" | "C" | "D",
-    created_at: string,
-    explanation: string,
-    id: number,
-    lesson_id: number,
-    option_a: string,
-    option_b: string,
-    option_c: string,
-    option_d: string,
-    question_order: number,
-    question_text: string
-}
 // export const createLessonQuizQueryOptions = (lessonId: number) => {
 //     return queryOptions({
 //         queryKey: ["lesson_quiz", lessonId],
@@ -145,26 +103,6 @@ export type LessonQuizQuestion = {
 //     })
 // }
 
-export type LessonRoadmap = {
-  core: Lesson[],
-  targeted: Lesson[],
-  optional: Lesson[]
-}
-export type Lesson = {
-  id: number,
-  title: string,
-  description: string,
-  lesson_order: number,
-  tier: string,
-  target_domains: string[],
-  assignment_reason: string,
-  assigned_at: string,
-  status: "not_started" | "in_progress" | "completed",
-  quiz_score: number | null,
-  quiz_attempts: number | null,
-  completed_at: string | null,
-  sublessons: number
-}
 // export const createLessonRoadmapQueryOptions = (userId: string) =>{
 //     return queryOptions({
 //         queryKey: ["user_roadmap", userId],
