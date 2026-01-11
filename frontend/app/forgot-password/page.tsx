@@ -45,7 +45,7 @@ export default function ForgotPassword() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await authClient.requestPasswordReset({
       email: values.email,
-      redirectTo: "http://localhost:3000/reset-password?forgot=true",
+      redirectTo: "https://know-your-vote.vercel.app/reset-password?forgot=true",
     }, {
       onRequest: (ctx) => {
         setLoading(true)
