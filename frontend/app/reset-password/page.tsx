@@ -35,6 +35,18 @@ export default function ResetPassword() {
 
   const { data:session, isPending:sessionLoading } = authClient.useSession()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(false)
+  const [showOldPassword, setShowOldPassword] = useState<boolean>(false)
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false)
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      old: "",
+      new: ""
+    }
+  })
   
   if (sessionLoading || !window) {
     return (
@@ -67,27 +79,14 @@ export default function ResetPassword() {
     ) 
   }
 
-  const router = useRouter()
-  const [loading, setLoading] = useState<boolean>(false)
-
   const conditionalTitle = !fromForgotPassword ? "Enter your current and newly chosen password:" : "Create your new password below:"
 
-  const [showOldPassword, setShowOldPassword] = useState<boolean>(false)
-  const [showNewPassword, setShowNewPassword] = useState<boolean>(false)
   function toggleOldVisibility() {
     setShowOldPassword(prev => !prev)
   }
   function toggleNewVisibility() {
     setShowNewPassword(prev => !prev)
   }
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      old: "",
-      new: ""
-    }
-  })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!token && fromForgotPassword) return
