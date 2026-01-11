@@ -1,1 +1,1 @@
-export const FLASK_SERVER = "http://localhost:5000"
+export const FLASK_SERVER = "https://know-your-vote-2mmet.ondigitalocean.app"
