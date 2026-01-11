@@ -3,7 +3,7 @@ import { hasCompletedAssessment, getUserLessonRoadmap, isPromiseFulfilled } from
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import Roadmap from "@/components/roadmap/roadmap"
-import { LessonRoadmap } from "@/hooks/query-options"
+import { LessonRoadmap } from "@/types/queries"
 
 export default async function RoadmapPage() {
     const session = await auth.api.getSession({
@@ -19,7 +19,7 @@ export default async function RoadmapPage() {
 
     if (!results.every(isPromiseFulfilled)) {
         return (
-            <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+            <div className="min-h-screen bg-background p-6 md:p-8 flex justify-center items-center">
                 <p>Failed to retrieve roadmap: Does not exist</p>
             </div>
         )

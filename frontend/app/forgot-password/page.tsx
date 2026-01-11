@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import Link from "next/link"
+import { FiArrowLeft } from "react-icons/fi"
 
 const formSchema = z.object({
     email: z.string().min(5, {
@@ -61,13 +63,19 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
+        <Link href="/login" className="px-2">
+          <Button variant="outline" className="cursor-pointer gap-2 -ml-2">
+            <FiArrowLeft className="w-4 h-4" />
+            Back to Login
+          </Button>
+        </Link>
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card className="py-6">
             <CardHeader className="text-center mt-4">
               <CardTitle className="text-xl">Forgot Password</CardTitle>
-              <CardDescription>Enter your email to receive a verification link to reset your password:</CardDescription>
+              <CardDescription className="font-light">Enter your email to receive a verification link to reset your password:</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -87,7 +95,7 @@ export default function ForgotPassword() {
                           />
                         </div>
                       </div>
-                      <Button type="submit" className="w-full" disabled={loading === true}>
+                      <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600" disabled={loading === true}>
                         {loading ? <Loader2 className="size-4 animate-spin"/> : "Confirm"}
                       </Button>
                     </div>

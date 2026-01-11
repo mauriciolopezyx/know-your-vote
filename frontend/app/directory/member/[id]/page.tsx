@@ -20,7 +20,7 @@ export default async function DirectoryMemberPage({ params }: { params: {id: str
 
   if (!results.every(isPromiseFulfilled)) {
     return (
-      <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+      <div className="min-h-screen bg-background p-6 md:p-8 flex justify-center items-center">
         <p>Failed to retrieve congressional member: Does not exist</p>
         {results.map(res => {
           return (

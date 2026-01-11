@@ -5,11 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
-  FiPhone,
-  FiMapPin,
-  FiCalendar,
-  FiGlobe,
-  FiMail,
   FiArrowLeft,
   FiUser,
   FiCheckCircle,
@@ -78,18 +73,16 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Back Button */}
-      <div className="border-b border-border bg-card">
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-4">
-          <Link href="/directory">
-            <Button variant="ghost" className="gap-2 -ml-2">
-              <FiArrowLeft className="w-4 h-4" />
-              Back to Directory
-            </Button>
-          </Link>
-        </div>
+      <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+        <Link href="/directory">
+          <Button variant="outline" className="cursor-pointer gap-2 -ml-2">
+            <FiArrowLeft className="w-4 h-4" />
+            Back to Directory
+          </Button>
+        </Link>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 md:px-8 py-4">
         {/* Profile Card */}
         <Card className="overflow-hidden mb-6">
           <CardContent className="p-0">
@@ -125,10 +118,10 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
                     </p>
                   </div>
 
-                  <Button
+                  {/* <Button
                     onClick={handleFollowToggle}
                     className={`gap-2 ${
-                      isFollowing ? "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700" : ""
+                      isFollowing ? "cursor-pointer bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700" : "cursor-pointer"
                     }`}
                     variant={isFollowing ? "default" : "outline"}
                   >
@@ -143,7 +136,7 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
                         Follow
                       </>
                     )}
-                  </Button>
+                  </Button> */}
                 </div>
 
                 {/* Status Badge */}
@@ -188,36 +181,27 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
         <Card className="mb-6">
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <FiMail className="w-6 h-6" />
               Contact Information
             </h2>
 
             <div className="space-y-4">
               {/* Office Address */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted">
-                <FiMapPin className="w-5 h-5 mt-1 shrink-0 text-foreground" />
-                <div>
-                  <div className="text-sm font-bold text-muted-foreground mb-1">Office Address</div>
-                  <div className="text-foreground">{member.office_address}</div>
-                </div>
+              <div className="flex flex-col items-start p-4 rounded-lg bg-muted">
+                <div className="text-sm font-bold text-muted-foreground mb-1">Office Address</div>
+                <div className="text-foreground">{member.office_address}</div>
               </div>
 
               {/* Phone Number */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted">
-                <FiPhone className="w-5 h-5 mt-1 shrink-0 text-foreground" />
-                <div>
-                  <div className="text-sm font-bold text-muted-foreground mb-1">Phone Number</div>
-                  <a href={`tel:${member.phone_number}`} className="text-foreground hover:underline">
-                    {member.phone_number}
-                  </a>
-                </div>
+              <div className="flex flex-col items-start p-4 rounded-lg bg-muted">
+                <div className="text-sm font-bold text-muted-foreground mb-1">Phone Number</div>
+                <a href={`tel:${member.phone_number}`} className="text-foreground hover:underline">
+                  {member.phone_number}
+                </a>
               </div>
 
               {/* Official Website */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted">
-                <FiGlobe className="w-5 h-5 mt-1 shrink-0 text-foreground" />
-                <div>
-                  <div className="text-sm font-bold text-muted-foreground mb-1">Official Website</div>
+              <div className="flex flex-col items-start p-4 rounded-lg bg-muted">
+                <div className="text-sm font-bold text-muted-foreground mb-1">Official Website</div>
                   {member.official_website ?
                   <a
                     href={member.official_website}
@@ -228,7 +212,6 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
                     {member.official_website}
                   </a>
                   : null}
-                </div>
               </div>
 
               {/* District (if applicable) */}
@@ -249,7 +232,6 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
         <Card className="mb-6">
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <FiCalendar className="w-6 h-6" />
               Term Information
             </h2>
 
@@ -273,7 +255,6 @@ export default function DirectoryMemberDetail({member, sponsoredBills}: {member:
           <Card className="mb-6">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <FiMail className="w-6 h-6" />
                 Bills Sponsored
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">

@@ -4,8 +4,7 @@ import { useState } from "react"
 import { FaChevronLeft, FaChevronRight, FaBook, FaLightbulb, FaExternalLinkAlt } from "react-icons/fa"
 import { Card as UI_Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { LessonContent } from "@/hooks/query-options"
-import { LessonCard } from "@/hooks/query-options"
+import { LessonContent, LessonCard } from "@/types/queries"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 
@@ -68,7 +67,7 @@ export default function Lesson({lesson, sublessons}: {lesson: LessonContent, sub
   }
 
   return (
-    <div className="min-h-screen bg-muted from-blue-50 to-white p-4 md:p-8">
+    <div className="min-h-screen bg-background from-blue-50 to-white p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <div className="flex items-center gap-2 text-blue-500 mb-2">

@@ -19,7 +19,7 @@ export default async function LessonQuizPage({ params }: { params: {id: string} 
 
     if (!results.every(isPromiseFulfilled)) {
         return (
-            <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+            <div className="min-h-screen bg-background p-6 md:p-8 flex justify-center items-center">
                 <p>Failed to retrieve lesson quiz: Does not exist</p>
             </div>
         )

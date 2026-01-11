@@ -3,11 +3,11 @@
 import { SubmitLessonQuiz } from "@/actions/db"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { LessonQuizQuestion } from "@/hooks/query-options"
+import { LessonQuizQuestion } from "@/types/queries"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState } from "react"
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
+import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi"
 
 export default function LessonQuiz({quiz}: {quiz: LessonQuizQuestion[]}) {
 
@@ -76,7 +76,7 @@ export default function LessonQuiz({quiz}: {quiz: LessonQuizQuestion[]}) {
     }
 
     return (
-        <div className="min-h-screen bg-muted p-6 md:p-8">
+        <div className="min-h-screen bg-background p-6 md:p-8">
             <div className="mx-auto max-w-4xl">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-blue-500">Lesson {params.id} Quiz</h1>
@@ -87,10 +87,11 @@ export default function LessonQuiz({quiz}: {quiz: LessonQuizQuestion[]}) {
                     <Progress value={progressValue} className={`w-full max-w-2xl ${currentStage === -1 ? "[&>div]:bg-blue-500" : currentStage === 0 ? "[&>div]:bg-red-500" : "[&>div]:bg-green-500"}`} />
                     {canSubmit ? <Button size="lg" className="cursor-pointer bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={handleStartLesson}>Submit</Button> : null}
                     {currentStage === 1 ? (
-                        <Link href="/roadmap">
-                            <div className="shadow-md rounded-full py-2 px-5 text-x text-white bg-green-500 hover:bg-green-600 transition-colors">
-                                <span>Go To Roadmap</span>
-                            </div>
+                        <Link href="/roadmap" className="px-2">
+                            <Button variant="outline" className="cursor-pointer gap-2 -ml-2 bg-green-500 hover:bg-green-600">
+                                <FiArrowRight className="w-4 h-4" />
+                                Go to Roadmap
+                            </Button>
                         </Link>
                     ) : null}
                     {currentStage === 0 ? <Button size="lg" className="cursor-pointer bg-red-500 text-white text-xl hover:bg-red-600" onClick={handleRestartLesson}>Retry Quiz</Button> : null}

@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
-import { AssessmentQuestion } from "@/hooks/query-options"
+import { AssessmentQuestion } from "@/types/queries"
 import { useMutation } from "@tanstack/react-query"
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
+import { FiBookOpen, FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { authClient } from "@/lib/auth-client"
@@ -30,7 +30,7 @@ export default function Assessment({assessment}: {assessment: AssessmentQuestion
 
   if (assessmentResponseLoading) {
     return (
-      <div className="bg-muted min-h-svh flex flex-col justify-center items-center">
+      <div className="bg-background min-h-svh flex flex-col justify-center items-center">
         <Loader2 className="size-32 animate-spin"/>
         <p className="text-xl mt-5">Assessment submitted! Awaiting results...</p>
         <p className="text-sm mt-5">Results may take up to 1-2 minutes</p>
@@ -41,8 +41,10 @@ export default function Assessment({assessment}: {assessment: AssessmentQuestion
 
   if (question === -1) {
     return (
-      <div className="min-h-screen bg-muted p-6 md:p-8">
-        <Button size="lg" className="bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={() => {setQuestion(0)}}>Begin Assessment</Button>
+      <div className="min-h-screen bg-background p-6 md:p-8 flex flex-col items-center justify-center gap-y-4">
+        <FiBookOpen className="size-16"/>
+        <p>The assessment is composed of free response questions aimed to assess your foundational civic understanding</p>
+        <Button size="lg" className="cursor-pointer bg-blue-500 text-white text-xl hover:bg-blue-600" onClick={() => {setQuestion(0)}}>Begin</Button>
       </div>
     )
   }
@@ -58,7 +60,7 @@ export default function Assessment({assessment}: {assessment: AssessmentQuestion
   }
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-8">
+    <div className="min-h-screen bg-background p-6 md:p-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-blue-500">Assessment</h1>

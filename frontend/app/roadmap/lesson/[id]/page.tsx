@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { LessonCard } from "@/hooks/query-options"
+import { LessonCard } from "@/types/queries"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { getLessonContent, isPromiseFulfilled } from "@/lib/server-queries"
@@ -47,7 +47,7 @@ export default async function LessonPage({ params }: { params: {id: string} }) {
 
   if (!results.every(isPromiseFulfilled)) {
     return (
-      <div className="min-h-screen bg-muted p-6 md:p-8 flex justify-center items-center">
+      <div className="min-h-screen bg-background p-6 md:p-8 flex justify-center items-center">
         <p>Failed to retrieve lesson: Does not exist</p>
       </div>
     )

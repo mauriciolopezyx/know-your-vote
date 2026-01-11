@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase-server"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-import { LessonQuizQuestion } from "@/hooks/query-options"
+import { LessonQuizQuestion } from "@/types/queries"
 
 type StartLessonFormData = {
   lessonId: number

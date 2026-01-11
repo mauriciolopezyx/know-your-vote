@@ -73,10 +73,10 @@ export default function Login() {
     }
 
     return (
-        <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div className="flex w-full max-w-sm flex-col gap-6">
                 <div className="flex flex-col gap-6">
-                    <Card>
+                    <Card className="py-6">
                         <CardHeader className="text-center mt-4">
                             <CardTitle className="text-xl">Login</CardTitle>
                         </CardHeader>
@@ -92,6 +92,7 @@ export default function Login() {
                                                     placeholder=""
                                                     type="email"
                                                     isOptional={false}
+                                                    className="font-light"
                                                 />
                                             </div>
                                             <div className="grid gap-3">
@@ -114,9 +115,10 @@ export default function Login() {
                                                         <LuEye className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
                                                         : <LuEyeClosed className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleVisibility} />
                                                     }
+                                                    className="font-light"
                                                 />
                                             </div>
-                                            <Button type="submit" className="w-full" disabled={loading === true}>
+                                            <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600" disabled={loading === true}>
                                                 {loading ? <Loader2 className="size-4 animate-spin"/> : "Login"}
                                             </Button>
                                         </div>
@@ -136,9 +138,9 @@ export default function Login() {
                                                 Login with Google
                                             </Button>
                                         </div>
-                                        <div className="text-center text-sm">
+                                        <div className="text-center font-light text-sm">
                                             Don&apos;t have an account?{" "}
-                                            <Link href="/register" className="underline underline-offset-4">
+                                            <Link href="/register" className="underline font-normal underline-offset-4">
                                                 Register
                                             </Link>
                                         </div>

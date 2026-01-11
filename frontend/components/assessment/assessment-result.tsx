@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge"
 import { FaCheckCircle, FaExclamationTriangle, FaBook, FaVoteYea, FaLandmark, FaNewspaper } from "react-icons/fa"
 import Link from "next/link"
 import { formatDomain } from "../roadmap/roadmap"
+import { Button } from "../ui/button"
+import { FiArrowRight } from "react-icons/fi"
 
 export const getDomainIcon = (domain: string) => {
   switch (domain) {
@@ -55,16 +57,17 @@ export type AssessmentResponse = {
 
 export default function AssessmentResult({data}: {data: AssessmentResponse}) {
   return (
-    <div className="flex flex-row justify-center items-center min-h-screen bg-muted p-4 md:p-8 mx-auto space-y-6">
+    <div className="flex flex-row justify-center items-center min-h-screen bg-background p-4 md:p-8 mx-auto space-y-6">
         <div className="max-w-5xl">
-          <Card>
+          <Card className="py-6">
               <CardHeader>
                 <div className="flex flex-row justify-between items-center">
                   <CardTitle className="text-2xl md:text-3xl font-bold">Assessment Results</CardTitle>
-                  <Link href="/roadmap">
-                    <div className="border rounded-full px-5 text-xl text-blue-400">
-                      <span>Go To Roadmap</span>
-                    </div>
+                  <Link href="/roadmap" className="px-2">
+                    <Button variant="outline" className="cursor-pointer gap-2 -ml-2 bg-blue-500 hover:bg-blue-600 text-white hover:text-white">
+                      <FiArrowRight className="w-4 h-4" />
+                      Go to Roadmap
+                    </Button>
                   </Link>
                 </div>
                 <CardDescription>Your civic knowledge evaluation</CardDescription>
@@ -116,7 +119,7 @@ export default function AssessmentResult({data}: {data: AssessmentResponse}) {
               <h2 className="text-xl font-bold my-4">Domain Performance</h2>
               <div className="grid gap-4 md:grid-cols-2">
                   {data.domain_evaluations.map((domain) => (
-                      <Card key={domain.domain} className="overflow-hidden">
+                      <Card key={domain.domain} className="overflow-hidden py-6">
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">

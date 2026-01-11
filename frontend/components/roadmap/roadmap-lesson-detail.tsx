@@ -3,7 +3,7 @@
 import { FaBook, FaArrowLeft } from "react-icons/fa"
 import { Card as UI_Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Lesson } from "@/hooks/query-options"
+import { Lesson } from "@/types/queries"
 import { getStatusConfig, getTierColor, getTierBadgeColor, formatDomain } from "@/components/roadmap/roadmap"
 import { StartLesson } from "@/actions/db"
 
@@ -47,7 +47,7 @@ export default function RoadmapLessonDetail({ data, onBack }: RoadmapLessonDetai
   }
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-10">
+    <div className="min-h-screen bg-background p-6 md:p-10">
       <div className="max-w-2xl mx-auto">
         <Button
           variant="outline"

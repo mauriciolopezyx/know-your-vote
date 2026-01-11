@@ -132,10 +132,10 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card className="py-6">
             <CardHeader className="text-center mt-4">
               <CardTitle className="text-xl">Reset Password</CardTitle>
               <CardDescription>{conditionalTitle}</CardDescription>
@@ -167,7 +167,7 @@ export default function ResetPassword() {
                           : <LuEyeClosed className="absolute right-5 top-3/10 cursor-pointer" onClick={toggleNewVisibility} />}
                         />
                       </div>
-                      <Button type="submit" className="w-full" disabled={loading === true}>
+                      <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600" disabled={loading === true}>
                         {loading ? <Loader2 className="size-4 animate-spin"/> : "Confirm"}
                       </Button>
                     </div>

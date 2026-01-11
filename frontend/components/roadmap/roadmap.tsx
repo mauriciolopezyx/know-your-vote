@@ -7,17 +7,19 @@ import { FaLock } from "react-icons/fa"
 import Link from "next/link"
 import RoadmapLessonDetail from "@/components/roadmap/roadmap-lesson-detail"
 import { Lesson, LessonRoadmap } from "@/types/queries"
+import { Button } from "../ui/button"
+import { FiArrowLeft } from "react-icons/fi"
 
 export function getTierColor(tier: string): string {
   switch (tier) {
     case "core":
-      return "border-blue-400 bg-blue-50 dark:bg-gray-600"
+      return "border-blue-400 bg-blue-50 dark:bg-muted"
     case "targeted":
-      return "border-purple-400 bg-purple-50 dark:bg-gray-600"
+      return "border-purple-400 bg-purple-50 dark:bg-muted"
     case "optional":
-      return "border-green-400 bg-green-50 dark:bg-gray-600"
+      return "border-green-400 bg-green-50 dark:bg-muted"
     default:
-      return "border-gray-400 bg-gray-50 dark:bg-gray-600"
+      return "border-gray-400 bg-gray-50 dark:bg-muted"
   }
 }
 
@@ -85,13 +87,14 @@ export default function Roadmap({roadmap, hasCompletedAssessment}: {roadmap: Les
 
   if (!hasCompletedAssessment) {
     return (
-      <div className="bg-muted min-h-svh flex flex-col gap-y-4 justify-center items-center">
+      <div className="bg-background min-h-svh flex flex-col gap-y-4 justify-center items-center">
         <FaLock className="size-16"/>
         <p>Please complete the assessment in order to view your personalized roadmap!</p>
-        <Link href="/assessment">
-          <div className="border rounded-full px-5 text-xl">
-            <span>Go To Assessment</span>
-          </div>
+        <Link href="/assessment" className="px-2">
+          <Button variant="outline" className="cursor-pointer gap-2 -ml-2">
+            <FiArrowLeft className="w-4 h-4" />
+            Go to Assessment
+          </Button>
         </Link>
       </div>
     )
@@ -102,11 +105,11 @@ export default function Roadmap({roadmap, hasCompletedAssessment}: {roadmap: Les
   )
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-10">
+    <div className="min-h-screen bg-background p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Your Learning Roadmap</h1>
-          <p className="text-lg">Track your progress through personally assigned lessons</p>
+          <p className="text-muted-foreground">Track your progress through personally assigned lessons</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
